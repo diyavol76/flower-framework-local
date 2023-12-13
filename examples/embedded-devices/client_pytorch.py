@@ -1,6 +1,7 @@
 import argparse
 import warnings
 from collections import OrderedDict
+import random
 
 import flwr as fl
 import torch
@@ -33,7 +34,7 @@ parser.add_argument(
 
 
 warnings.filterwarnings("ignore", category=UserWarning)
-NUM_CLIENTS = 50
+NUM_CLIENTS = 8
 
 # a config for mobilenetv2 that works for
 # small input sizes (i.e. 32x32 as in CIFAR)
@@ -151,7 +152,9 @@ class FlowerClient(fl.client.NumPyClient):
             # let's not reduce spatial resolution too early
             self.model.features[0][0].stride = (1, 1)
         # Determine device
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        #self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+        print(self.device)
         self.model.to(self.device)  # send model to device
 
     def set_parameters(self, params):
@@ -175,8 +178,13 @@ class FlowerClient(fl.client.NumPyClient):
         batch, epochs = config["batch_size"], config["epochs"]
         # Construct dataloader
         trainloader = DataLoader(self.trainset, batch_size=batch, shuffle=True)
+        #Define array for different learning rates
+        lr = [0.03, 0.02,0.02, 0.01, 0.01, 0.01 ,0.01, 0.01, 0.008,0.005, 0.005]
+        #choose random learning rate from array
+        lr_value = random.choice(lr)
+        print("Learning rate: ", lr_value)
         # Define optimizer
-        optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01, momentum=0.9)
+        optimizer = torch.optim.SGD(self.model.parameters(), lr=lr_value, momentum=0.9,nesterov=True)
         # Train
         train(self.model, trainloader, optimizer, epochs=epochs, device=self.device)
         # Return local model and statistics
@@ -189,6 +197,7 @@ class FlowerClient(fl.client.NumPyClient):
         valloader = DataLoader(self.valset, batch_size=64)
         # Evaluate
         loss, accuracy = test(self.model, valloader, device=self.device)
+        print("LOSS: ", loss, " ACCURACY: ", accuracy, " NUM EXAMPLES: ", len(valloader.dataset))
         # Return statistics
         return float(loss), len(valloader.dataset), {"accuracy": float(accuracy)}
 
