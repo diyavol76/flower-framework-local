@@ -70,7 +70,10 @@ def main():
         fraction_fit=args.sample_fraction,
         fraction_evaluate=1,
         min_fit_clients=args.min_num_clients,
-        min_available_clients=3,
+        min_evaluate_clients=args.min_num_clients,
+
+
+        min_available_clients=args.min_num_clients,
         on_fit_config_fn=fit_config,
         evaluate_metrics_aggregation_fn=weighted_average,
     )
@@ -78,7 +81,7 @@ def main():
     # Start Flower server
     fl.server.start_server(
         server_address=args.server_address,
-        config=fl.server.ServerConfig(num_rounds=40),
+        config=fl.server.ServerConfig(num_rounds=20),
         strategy=strategy,
     )
 
