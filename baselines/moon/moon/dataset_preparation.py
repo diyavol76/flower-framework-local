@@ -10,7 +10,7 @@ block) that this file should be executed first.
 import numpy as np
 import torchvision.transforms as transforms
 
-from moon.dataset import CIFAR10Sub, CIFAR100Sub
+from dataset import CIFAR10Sub, CIFAR100Sub
 
 
 def load_cifar10_data(datadir):

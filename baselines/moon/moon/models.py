@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from moon.utils import compute_accuracy
+from utils import compute_accuracy
 
 
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):

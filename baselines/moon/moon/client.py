@@ -15,7 +15,7 @@ from flwr.common.typing import NDArrays, Scalar
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 
-from moon.models import init_net, train_fedprox, train_moon
+from models import init_net, train_fedprox, train_moon
 
 
 # pylint: disable=too-many-instance-attributes

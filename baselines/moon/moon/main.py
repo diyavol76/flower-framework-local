@@ -16,11 +16,10 @@ import numpy as np
 import torch
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
-
-from moon import client, server
-from moon.dataset import get_dataloader
-from moon.dataset_preparation import partition_data
-from moon.utils import plot_metric_from_history
+import client, server
+from dataset import get_dataloader
+from dataset_preparation import partition_data
+from utils import plot_metric_from_history
 
 
 @hydra.main(config_path="conf", config_name="base", version_base=None)
@@ -87,8 +86,8 @@ def main(cfg: DictConfig) -> None:
     # get function that will executed by the strategy's evaluate() method
     # Set server's device
     device = (
-        torch.device("cuda:0")
-        if torch.cuda.is_available() and cfg.server_device == "cuda"
+        torch.device("mps")
+        if torch.backends.mps.is_available() and cfg.server_device == "cuda"
         else "cpu"
     )
     evaluate_fn = server.gen_evaluate_fn(test_global_dl, device=device, cfg=cfg)
